@@ -6,9 +6,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        StochasticSim stochasticSim = new StochasticSim(100);
+        StochasticSim stochasticSim = new StochasticSim(1000);
 
-        stochasticSim.run();
-        stochasticSim.printLog();
+        SimEvents simEvents = stochasticSim.run();
+        simEvents.printLog();
     }
 }

@@ -4,6 +4,7 @@ public class Program {
     private int id;
     private float startTime;
     private float processTime;
+    private float timeLeft;
     private int memSize;
     private int ioOperations;
 
@@ -11,6 +12,7 @@ public class Program {
         this.id = id;
         this.startTime = startTime;
         this.processTime = processTime;
+        this.timeLeft = processTime;
         this.memSize = memSize;
         this.ioOperations = ioOperations;
     }
@@ -25,5 +27,17 @@ public class Program {
 
     int getId() {
         return id;
+    }
+
+    float nextInterruptTime(float currentTime) {
+        return currentTime + processTime / ioOperations;
+    }
+
+    void updateTimeLeft() {
+        timeLeft -= processTime / ioOperations;
+    }
+
+    boolean isDone() {
+        return timeLeft <= 0;
     }
 }

@@ -1,63 +1,50 @@
 package usp.pcs;
 
-import sun.plugin2.gluegen.runtime.CPU;
-
 import java.util.ArrayList;
 import java.util.Random;
 
 class StochasticSim {
     private static final int MEM_SIZE = 500;
-    private static final int NUM_JOBS = 10;
-
-    private float duration;
-    private float currentTime = 0;
-    private int currentEvent = 0;
-    ArrayList<Program> programs = new ArrayList<>();
-    private ArrayList<SimEvent> simEvents = new ArrayList<>();
+    private static final int NUM_JOBS = 5;
+    private ArrayList<Program> programs = new ArrayList<>();
+    private SimEvents simEvents;
     private Memory memory = new Memory(MEM_SIZE);
     private SimProcessor processor = new SimProcessor();
-    private Disk disk;
+    private Disk disk = new Disk();
 
     StochasticSim(float duration) {
-        this.duration = duration;
+        simEvents = new SimEvents(duration);
     }
 
-    void run() {
+    SimEvents run() {
         SimEvent startup = new SimEvent(0, 1, 0);
-        simEvents.add(startup);
-        while (currentTime < duration && !simEvents.isEmpty())
+        simEvents.addEvent(startup);
+        while (!simEvents.endOfSimulation())
             execEvent();
+        return simEvents;
     }
 
     private void execEvent() {
-        SimEvent simEvent = getNextEvent();
+        SimEvent simEvent = simEvents.getNextEvent();
 
         if (simEvent.getType() == 1)
             execRoutine1();
-        else if (simEvent.getType() == 2) {
+        else {
             Program program = programs.get(simEvent.getProgram());
-            execRoutine2(program);
-        } else if (simEvent.getType() == 3) {
-            Program program = programs.get(simEvent.getProgram());
-            execRoutine3(program);
-        } else if (simEvent.getType() == 4)
-            execRoutine4();
-        else if (simEvent.getType() == 5)
-            execRoutine5();
-        else if (simEvent.getType() == 6)
-            execRoutine6();
-        else if (simEvent.getType() == 7)
-            execRoutine7();
-    }
-
-    private SimEvent getNextEvent() {
-        if (currentEvent < simEvents.size()) {
-            SimEvent nextEvent = simEvents.get(currentEvent++);
-            currentTime = nextEvent.getTime();
-            return nextEvent;
+            if (simEvent.getType() == 2) {
+                execRoutine2(program);
+            } else if (simEvent.getType() == 3) {
+                execRoutine3(program);
+            } else if (simEvent.getType() == 4)
+                execRoutine4();
+            else if (simEvent.getType() == 5) {
+                execRoutine5(program);
+            } else if (simEvent.getType() == 6) {
+                execRoutine6(program);
+            } else if (simEvent.getType() == 7) {
+                execRoutine7(program);
+            }
         }
-        currentTime = duration;
-        return new SimEvent(0, 0, 0);
     }
 
     // Gera mix de jobs
@@ -74,6 +61,7 @@ class StochasticSim {
 
             Program program = new Program(i, startTime, processTime, memSize, ioOperations);
             programs.add(program);
+            System.out.println("program " + i + ": IO Op.: " + ioOperations);
         }
 
         for (Program program : programs) {
@@ -82,21 +70,8 @@ class StochasticSim {
             int programId = program.getId();
 
             SimEvent jobStart = new SimEvent(time, type, programId);
-            addToList(jobStart);
+            simEvents.addEvent(jobStart);
         }
-    }
-
-    // Adiciona a lista de eventos mantendo-a ordenada no tempo
-    private void addToList(SimEvent simEvent) {
-        // TODO: otimizavel?
-        float eventTime = simEvent.getTime();
-        for (int i = 0; i < simEvents.size(); i++) {
-            if (eventTime < simEvents.get(i).getTime()) {
-                simEvents.add(i, simEvent);
-                return;
-            }
-        }
-        simEvents.add(simEvent);
     }
 
     private int genIoOperations() {
@@ -130,44 +105,33 @@ class StochasticSim {
 
     // Aloca job na memoria principal
     private void execRoutine2(Program program) {
-        if (memory.getAvailableSpace() > program.getMemSize())
-            addToList(new SimEvent(currentTime, 3, program.getId()));
-        memory.allocate(program);
+        memory.allocate(simEvents, program);
     }
 
     // Aloca job ao processador
     private void execRoutine3(Program program) {
-        if (processor.isAvailable()) {
-            addToList(new SimEvent(currentTime, 4, program.getId()));
-        }
-        processor.allocate(program);
+        processor.allocate(simEvents, program);
 
     }
 
     // Libera processador para operacao de IO
     private void execRoutine4() {
-
+        processor.release(simEvents);
     }
 
     // Envia operacao IO ao disco
-    private void execRoutine5() {
-
+    private void execRoutine5(Program program) {
+        disk.processIO(simEvents, program);
     }
 
     // Libera disco
-    private void execRoutine6() {
-
+    private void execRoutine6(Program program) {
+        disk.completeIO(simEvents);
+        processor.allocate(simEvents, program);
     }
 
     // Termina job
-    private void execRoutine7() {
-
-    }
-
-    void printLog() {
-        for (SimEvent simEvent: simEvents) {
-            String eventMsg = simEvent.getLog();
-            System.out.println(eventMsg);
-        }
+    private void execRoutine7(Program program) {
+        memory.release(simEvents, program);
     }
 }

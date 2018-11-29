@@ -1,8 +1,6 @@
 package usp.pcs;
 
-import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 class Memory {
     private int availableSpace;
@@ -16,10 +14,23 @@ class Memory {
         return availableSpace;
     }
 
-    void allocate(Program program) {
-        if (availableSpace > program.getMemSize())
+    void allocate(SimEvents simEvents, Program program) {
+        if (availableSpace > program.getMemSize()) {
             availableSpace -= program.getMemSize();
-        else
+            simEvents.addEvent(new SimEvent(simEvents.getCurrentTime(), 3, program.getId()));;
+        } else
             queue.add(program);
+    }
+
+    void release(SimEvents simEvents, Program program) {
+        availableSpace += program.getMemSize();
+
+        for (Program nextProgram: queue) {
+            if (availableSpace > nextProgram.getMemSize()) {
+                availableSpace -= program.getMemSize();
+                simEvents.addEvent(new SimEvent(simEvents.getCurrentTime(), 3, program.getId()));
+                queue.remove(nextProgram);
+            }
+        }
     }
 }
