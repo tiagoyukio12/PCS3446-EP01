@@ -63,10 +63,11 @@ class StochasticSim {
     // Gera mix de jobs
     private void execRoutine1() {
         Random rand = new Random();
-        float Ta = 10;
+        float Ta = 5;
+        float startTime = 0;
 
         for (int i = 0; i < NUM_JOBS; i++) {
-            float startTime = (float) (-Ta * Math.log(rand.nextFloat()));
+            startTime += (float) (-Ta * Math.log(rand.nextFloat()));
             float processTime = 50 * rand.nextFloat();
             int memSize = genMemSize();
             int ioOperations = genIoOperations();
