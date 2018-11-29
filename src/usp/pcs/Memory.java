@@ -16,7 +16,7 @@ class Memory {
         return availableSpace;
     }
 
-    public void allocate(Program program) {
+    void allocate(Program program) {
         if (availableSpace > program.getMemSize())
             availableSpace -= program.getMemSize();
         else

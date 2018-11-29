@@ -1,6 +1,7 @@
 package usp.pcs;
 
-import javax.annotation.processing.Processor;
+import sun.plugin2.gluegen.runtime.CPU;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ class StochasticSim {
     ArrayList<Program> programs = new ArrayList<>();
     private ArrayList<SimEvent> simEvents = new ArrayList<>();
     private Memory memory = new Memory(MEM_SIZE);
-    private Processor processor;
+    private SimProcessor processor = new SimProcessor();
     private Disk disk;
 
     StochasticSim(float duration) {
@@ -36,9 +37,10 @@ class StochasticSim {
         else if (simEvent.getType() == 2) {
             Program program = programs.get(simEvent.getProgram());
             execRoutine2(program);
-        } else if (simEvent.getType() == 3)
-            execRoutine3();
-        else if (simEvent.getType() == 4)
+        } else if (simEvent.getType() == 3) {
+            Program program = programs.get(simEvent.getProgram());
+            execRoutine3(program);
+        } else if (simEvent.getType() == 4)
             execRoutine4();
         else if (simEvent.getType() == 5)
             execRoutine5();
@@ -100,7 +102,7 @@ class StochasticSim {
         Random rand = new Random();
         float p = rand.nextFloat();
         if (p < 0.1)
-            return 0;
+            return 1;
         if (p < 0.3)
             return 5;
         if (p < 0.7)
@@ -133,7 +135,11 @@ class StochasticSim {
     }
 
     // Aloca job ao processador
-    private void execRoutine3() {
+    private void execRoutine3(Program program) {
+        if (processor.isAvailable()) {
+            addToList(new SimEvent(currentTime, 4, program.getId()));
+        }
+        processor.allocate(program);
 
     }
 
