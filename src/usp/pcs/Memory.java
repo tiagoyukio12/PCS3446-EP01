@@ -1,17 +1,25 @@
 package usp.pcs;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 class Memory {
-    private int size;
     private int availableSpace;
+    private ArrayList<Program> queue = new ArrayList<>();
 
     Memory(int size) {
-        this.size = size;
+        availableSpace = size;
     }
 
     int getAvailableSpace() {
         return availableSpace;
+    }
+
+    public void allocate(Program program) {
+        if (availableSpace > program.getMemSize())
+            availableSpace -= program.getMemSize();
+        else
+            queue.add(program);
     }
 }

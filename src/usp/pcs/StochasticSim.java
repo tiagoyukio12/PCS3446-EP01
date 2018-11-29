@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 class StochasticSim {
-    private static final int MEM_SIZE = 1000;
+    private static final int MEM_SIZE = 500;
     private static final int NUM_JOBS = 10;
 
     private float duration;
     private float currentTime = 0;
     private int currentEvent = 0;
+    ArrayList<Program> programs = new ArrayList<>();
     private ArrayList<SimEvent> simEvents = new ArrayList<>();
     private Memory memory = new Memory(MEM_SIZE);
     private Processor processor;
@@ -32,9 +33,10 @@ class StochasticSim {
 
         if (simEvent.getType() == 1)
             execRoutine1();
-        else if (simEvent.getType() == 2)
-            execRoutine2();
-        else if (simEvent.getType() == 3)
+        else if (simEvent.getType() == 2) {
+            Program program = programs.get(simEvent.getProgram());
+            execRoutine2(program);
+        } else if (simEvent.getType() == 3)
             execRoutine3();
         else if (simEvent.getType() == 4)
             execRoutine4();
@@ -58,7 +60,6 @@ class StochasticSim {
 
     // Gera mix de jobs
     private void execRoutine1() {
-        ArrayList<Program> programs = new ArrayList<>();
         Random rand = new Random();
         float Ta = 10;
 
@@ -125,8 +126,10 @@ class StochasticSim {
     }
 
     // Aloca job na memoria principal
-    private void execRoutine2() {
-
+    private void execRoutine2(Program program) {
+        if (memory.getAvailableSpace() > program.getMemSize())
+            addToList(new SimEvent(currentTime, 3, program.getId()));
+        memory.allocate(program);
     }
 
     // Aloca job ao processador
