@@ -5,7 +5,7 @@ import java.util.Random;
 
 class StochasticSim {
     private static final int MEM_SIZE = 500;
-    private static final int NUM_JOBS = 5;
+    private static final int NUM_JOBS = 25;
     private ArrayList<Program> programs = new ArrayList<>();
     private SimEvents simEvents;
     private Memory memory = new Memory(MEM_SIZE);

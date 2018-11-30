@@ -25,7 +25,9 @@ class Memory {
     void release(SimEvents simEvents, Program program) {
         availableSpace += program.getMemSize();
 
-        for (Program nextProgram: queue) {
+        int i = 0;
+        while (i < queue.size()) {
+            Program nextProgram = queue.get(i++);
             if (availableSpace > nextProgram.getMemSize()) {
                 availableSpace -= program.getMemSize();
                 simEvents.addEvent(new SimEvent(simEvents.getCurrentTime(), 3, program.getId()));
