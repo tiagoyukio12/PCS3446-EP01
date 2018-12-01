@@ -4,16 +4,20 @@ import java.util.ArrayList;
 import java.util.Random;
 
 class StochasticSim {
-    private static final int MEM_SIZE = 500;
-    private static final int NUM_JOBS = 5;
+    private static final int MEM_SIZE = 1000;  // Main memory size [kilobytes]
+    private static final float DURATION = (float) 10e4;  // Duration of the simulation [milliseconds]
+    private static final float DISK_SPEED = (float) 10.0e5;  // Transfer speed of the disk [KB/s]
+    private static final float DISK_POS = 10; // Positioning time of the disk [milliseconds]
+    private static final float DISK_REV = 10000;  // Disk revolution speed [RPM]
+    private static final int NUM_JOBS = 25;  // Number of jobs in the simulation
     private ArrayList<Program> programs = new ArrayList<>();
     private SimEvents simEvents;
     private Memory memory = new Memory(MEM_SIZE);
     private SimProcessor processor = new SimProcessor();
-    private Disk disk = new Disk();
+    private Disk disk = new Disk(DISK_POS, DISK_REV, DISK_SPEED);
 
-    StochasticSim(float duration) {
-        simEvents = new SimEvents(duration);
+    StochasticSim() {
+        simEvents = new SimEvents(DURATION);
     }
 
     SimEvents run() {
@@ -58,9 +62,10 @@ class StochasticSim {
             float processTime = 50 * rand.nextFloat();
             int memSize = genMemSize();
             int ioOperations = genIoOperations();
-            int priority = (int) (10 * rand.nextFloat()) + 1;
+            int recordSize = genRecordSize();
+            int priority = (int) (5 * rand.nextFloat()) + 1;
 
-            Program program = new Program(i, startTime, processTime, memSize, ioOperations, priority);
+            Program program = new Program(i, startTime, processTime, memSize, ioOperations, recordSize, priority);
             programs.add(program);
             System.out.println("program " + i + "\nIO Op.: " + ioOperations + ", Priority: " + priority + ", Process " +
                     "Time: " + processTime);
@@ -76,18 +81,32 @@ class StochasticSim {
         }
     }
 
+    private int genRecordSize() {
+        Random rand = new Random();
+        float p = rand.nextFloat();
+        if (p < 0.1)
+            return (int) (1*10e3);
+        if (p < 0.3)
+            return (int) (2*10e3);
+        if (p < 0.7)
+            return (int) (3*10e3);
+        if (p < 0.9)
+            return (int) (4*10e3);
+        return (int) (5*10e3);
+    }
+
     private int genIoOperations() {
         Random rand = new Random();
         float p = rand.nextFloat();
         if (p < 0.1)
             return 1;
         if (p < 0.3)
-            return 5;
+            return 2;
         if (p < 0.7)
-            return 10;
+            return 5;
         if (p < 0.9)
-            return 25;
-        return 50;
+            return 8;
+        return 10;
     }
 
     private int genMemSize() {

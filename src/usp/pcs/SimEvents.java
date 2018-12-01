@@ -67,4 +67,17 @@ class SimEvents {
             }
         }
     }
+
+    void printStatistics() {
+        for (SimEvent event2: simEvents) {
+            if (event2.getType() == 2) {
+                for (SimEvent event7: simEvents) {
+                    if(event7.getType() == 7 && event2.getProgram() == event7.getProgram()) {
+                        float duration = event7.getTime() - event2.getTime();
+                        System.out.println("Program " + event2.getProgram() + ", duration: " + duration);
+                    }
+                }
+            }
+        }
+    }
 }

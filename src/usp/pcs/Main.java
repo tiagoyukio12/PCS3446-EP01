@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        StochasticSim stochasticSim = new StochasticSim(1000);
+        StochasticSim stochasticSim = new StochasticSim();
         SimEvents simEvents = stochasticSim.run();
 
         Scanner scanIn = new Scanner(System.in);
@@ -20,6 +20,9 @@ public class Main {
                     break;
                 case "JOB":
                     simEvents.printJob(Integer.parseInt(command[1]));
+                    break;
+                case "STA":
+                    simEvents.printStatistics();
                     break;
                 case "END":
                     break label;

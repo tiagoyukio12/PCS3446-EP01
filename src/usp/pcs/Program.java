@@ -7,15 +7,17 @@ class Program {
     private float timeLeft;
     private int memSize;
     private int ioOperations;
+    private int recordSize;
     private int priority;
 
-    Program(int id, float startTime, float processTime, int memSize, int ioOperations, int priority) {
+    Program(int id, float startTime, float processTime, int memSize, int ioOperations, int recordSize, int priority) {
         this.id = id;
         this.lastStartTime = startTime;
         this.processTime = processTime;
         this.timeLeft = processTime;
         this.memSize = memSize;
         this.ioOperations = ioOperations;
+        this.recordSize = recordSize;
         this.priority = priority;
     }
 
@@ -53,5 +55,9 @@ class Program {
 
     int getPriority() {
         return priority;
+    }
+
+    int getRecordSize() {
+        return recordSize;
     }
 }
