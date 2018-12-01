@@ -5,7 +5,7 @@ import java.util.Random;
 
 class StochasticSim {
     private static final int MEM_SIZE = 500;
-    private static final int NUM_JOBS = 25;
+    private static final int NUM_JOBS = 5;
     private ArrayList<Program> programs = new ArrayList<>();
     private SimEvents simEvents;
     private Memory memory = new Memory(MEM_SIZE);
@@ -58,14 +58,16 @@ class StochasticSim {
             float processTime = 50 * rand.nextFloat();
             int memSize = genMemSize();
             int ioOperations = genIoOperations();
+            int priority = (int) (10 * rand.nextFloat()) + 1;
 
-            Program program = new Program(i, startTime, processTime, memSize, ioOperations);
+            Program program = new Program(i, startTime, processTime, memSize, ioOperations, priority);
             programs.add(program);
-            System.out.println("program " + i + ": IO Op.: " + ioOperations);
+            System.out.println("program " + i + "\nIO Op.: " + ioOperations + ", Priority: " + priority + ", Process " +
+                    "Time: " + processTime);
         }
 
         for (Program program : programs) {
-            float time = program.getStartTime();
+            float time = program.getLastStartTime();
             int type = 2;
             int programId = program.getId();
 
@@ -111,7 +113,6 @@ class StochasticSim {
     // Aloca job ao processador
     private void execRoutine3(Program program) {
         processor.allocate(simEvents, program);
-
     }
 
     // Libera processador para operacao de IO

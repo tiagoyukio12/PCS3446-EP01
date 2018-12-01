@@ -17,7 +17,7 @@ class SimEvents {
     }
 
     // Adiciona a lista de eventos mantendo-a ordenada no tempo
-    public void addEvent(SimEvent simEvent) {
+    void addEvent(SimEvent simEvent) {
         // TODO: otimizavel?
         float eventTime = simEvent.getTime();
         for (int i = 0; i < simEvents.size(); i++) {
@@ -27,13 +27,6 @@ class SimEvents {
             }
         }
         simEvents.add(simEvent);
-    }
-
-    void printLog() {
-        for (SimEvent simEvent: simEvents) {
-            String eventMsg = simEvent.getLog();
-            System.out.println(eventMsg);
-        }
     }
 
     SimEvent getNextEvent() {
@@ -46,7 +39,32 @@ class SimEvents {
         return new SimEvent(0, 0, 0);
     }
 
-    public float getCurrentTime() {
+    float getCurrentTime() {
         return currentTime;
+    }
+
+    void cancelIOEvent(Program currentJob) {
+        for (int i = 0; i < simEvents.size(); i++) {
+            SimEvent simEvent = simEvents.get(i);
+            if (simEvent.getProgram() == currentJob.getId() && simEvent.getTime() > currentTime) {
+                simEvents.remove(i);
+            }
+        }
+    }
+
+    void printLog() {
+        for (SimEvent simEvent : simEvents) {
+            String eventMsg = simEvent.getLog();
+            System.out.println(eventMsg);
+        }
+    }
+
+    void printJob(int i) {
+        for (SimEvent simEvent : simEvents) {
+            if (simEvent.getProgram() == i) {
+                String eventMsg = simEvent.getLog();
+                System.out.println(eventMsg);
+            }
+        }
     }
 }
